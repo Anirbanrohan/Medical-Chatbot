@@ -1,6 +1,5 @@
-Apologies for the confusion earlier! Let's make sure the `/chat` endpoint is clearly documented in the API section. I'll update the `README.md` properly to reflect both the `/predict` and `/chat` endpoints in detail.
 
-### Corrected `README.md`
+### `README.md`
 
 ```markdown
 # Disease Prediction Web Application
@@ -67,12 +66,12 @@ To deploy the application locally, follow these steps:
 
 1. Clone this repository to your local machine:
    ```bash
-   git clone https://github.com/yourusername/disease-prediction.git
+   git clone https://github.com/Anirbanrohan/Medical-Chatbot.git
    ```
 
 2. Navigate to the project directory:
    ```bash
-   cd disease-prediction
+   cd Medical-Chatbot
    ```
 
 3. Create and activate a virtual environment:
