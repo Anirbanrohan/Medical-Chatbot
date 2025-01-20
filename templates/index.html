@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disease Prediction</title>
+    <style>
+        /* Base styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #f0f8ff;
+            color: #333;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        h1 {
+            color: #4CAF50;
+            text-align: center;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #333;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        label {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            display: block;
+            font-weight: bold;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 1em;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #chatContainer {
+            margin-top: 30px;
+            display: none;
+            flex-grow: 1;
+        }
+
+        /* Chat box and individual message styles */
+        #chatBox {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .message-container {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .user-message, .bot-message {
+            padding: 10px;
+            border-radius: 8px;
+            max-width: 75%;
+            word-wrap: break-word;
+        }
+
+        .user-message {
+            background-color: #d9fdd3;
+            color: #333;
+            margin-left: auto;
+            margin-right: 0;
+        }
+
+        .bot-message {
+            background-color: #e0e0e0;
+            color: #333;
+            margin-left: 0;
+            margin-right: auto;
+        }
+
+        /* Input area styling */
+        #chatInput {
+            width: calc(100% - 22px);
+            padding: 10px;
+            font-size: 1em;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        #sendButton {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+
+        #sendButton:hover {
+            background-color: #0056b3;
+        }
+
+        /* Loading spinner styling */
+        .loading-spinner {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3498db;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 2s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" style="margin:auto;">
+        <h1>Disease Prediction</h1>
+        <form id="symptomsForm">
+            <label for="symptoms">Symptoms (comma-separated): </label>
+            <input type="text" id="symptoms" name="symptoms" required>
+            <button type="submit">Submit Symptoms</button>
+        </form>
+
+        <h2>Chat with Bot</h2>
+        <div id="chatContainer">
+            <div id="chatBox"></div>
+            <input type="text" id="chatInput" placeholder="Ask a follow-up question..."><br>
+            <button id="sendButton">Send</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("symptomsForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+            
+            const symptoms = document.getElementById("symptoms").value.split(',').map(symptom => symptom.trim());
+            
+            const response = await fetch('/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ symptoms })
+            });
+            
+            const data = await response.json();
+            
+            if (data.predicted_disease) {
+                alert('Disease predicted: ' + data.predicted_disease);
+                document.getElementById("chatContainer").style.display = 'block';  // Show chat section
+            }
+        });
+
+        document.getElementById("sendButton").addEventListener("click", async function() {
+            const sendButton = document.getElementById("sendButton");
+            const message = document.getElementById("chatInput").value;
+
+            // If no message is entered, do nothing
+            if (message.trim() === '') return;
+
+            // Show the user's message and a loading spinner in the button
+            const chatBox = document.getElementById("chatBox");
+            const userMessage = document.createElement("div");
+            userMessage.classList.add("user-message");
+            userMessage.textContent = message;
+            chatBox.appendChild(userMessage);
+
+            // Show loading spinner in the button
+            sendButton.innerHTML = '<div class="loading-spinner"></div> Loading...';
+
+            // Ensure chat box scrolls to the latest message
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // Clear the input field after sending the question
+            document.getElementById("chatInput").value = '';
+
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message })
+            });
+
+            const data = await response.json();
+
+            // Replace the loading spinner with the original button text
+            sendButton.innerHTML = 'Send';
+
+            // Create a new message container for the bot's response
+            const messageContainer = document.createElement("div");
+            messageContainer.classList.add("message-container");
+
+            // Bot's response - split into paragraphs and bold text formatting
+            const formattedResponse = data.response.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>'); // Replace **text** with <b>text</b>
+            const paragraphs = formattedResponse.split('\n').filter(paragraph => paragraph.trim() !== '');
+            paragraphs.forEach(paragraph => {
+                const botMessage = document.createElement("div");
+                botMessage.classList.add("bot-message");
+                botMessage.innerHTML = paragraph; // Set innerHTML for bold text
+                messageContainer.appendChild(botMessage);
+            });
+
+            // Append the bot's response container to chat box
+            chatBox.appendChild(messageContainer);
+
+            // Ensure chat box scrolls to the latest message
+            chatBox.scrollTop = chatBox.scrollHeight;
+        });
+    </script>
+</body>
+</html>
