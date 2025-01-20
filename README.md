@@ -1,7 +1,7 @@
 
 ### `README.md`
 
-```markdown
+
 # Disease Prediction Web Application
 
 ## Overview
@@ -22,7 +22,7 @@ This endpoint predicts the disease based on the symptoms entered by the user.
 {
   "symptoms": ["fever", "cough", "fatigue"]
 }
-```
+
 
 #### Response:
 - **Status**: 200 OK
