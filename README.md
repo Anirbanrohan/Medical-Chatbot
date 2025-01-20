@@ -7,7 +7,7 @@
 ## Overview
 This is a web-based disease prediction system that allows users to input symptoms and get a disease prediction based on their input. It also includes a chatbot feature that answers follow-up questions related to the disease.
 
-The project uses machine learning for disease prediction (XGBoost classifier), a Flask backend to handle user inputs, and Cohere API for natural language responses.
+The project uses machine learning for disease prediction (Random Forest classifier), a Flask backend to handle user inputs, and Cohere API for natural language responses.
 
 ## API Endpoints
 
